@@ -15,7 +15,7 @@ Each run:
 
 1. snapshots the workspace
 2. optionally reads `workspace.txt`
-3. optionally reads `dyad-mapping/`
+3. optionally reads a local `dyad-mapping/` checkout from [`peterlodri-sec/dyad-mapping`](https://github.com/peterlodri-sec/dyad-mapping)
 4. asks a small council of Ralphs for the next decision
 5. appends the winning decision to `decisions.log`
 6. optionally uploads `decisions.log` to Hugging Face
@@ -131,7 +131,7 @@ The current workspace is the prompt context.
 Optional files/directories:
 
 - `workspace.txt`: extra plain-text context
-- `dyad-mapping/`: additional context from `README.md`, `essences.md`, and the latest `session-*-summary.md`
+- `dyad-mapping/`: additional context from a local checkout of [`peterlodri-sec/dyad-mapping`](https://github.com/peterlodri-sec/dyad-mapping), using `README.md`, `essences.md`, and the latest `session-*-summary.md`
 
 If those files are absent, the tool still runs.
 
@@ -155,7 +155,7 @@ uv run --with pytest pytest
 
 - `src/ultra_ralph_local/cli.py`: main CLI
 - `start_ralph_loop.sh`: thin local wrapper around `uv run`
-- `dyad-mapping/`: optional context files shipped in this repo
+- `dyad-mapping/`: optional context files mirrored from [`peterlodri-sec/dyad-mapping`](https://github.com/peterlodri-sec/dyad-mapping)
 
 ## Security notes
 
@@ -163,6 +163,21 @@ uv run --with pytest pytest
 - config is written to a user config file, not the repo
 - uploads use the Hugging Face API, not an external `hf` CLI dependency
 - `decisions.log` and `ralph-loop.log` are local runtime artifacts and are ignored
+
+## Main constellation
+
+The constellation — a sovereign mesh of art, music, books, math, and machine intelligence.
+
+Eleven surfaces, one commons. Self-hosted, self-owned, rendered in the open.
+
+Footer links mirrored from [`vaked.dev`](https://vaked.dev):
+
+- [verify](https://vaked.dev/verify)
+- [story](https://vaked.dev/story)
+- [about](https://vaked.dev/about)
+- [security](https://vaked.dev/security)
+- [privacy](https://vaked.dev/privacy)
+- [legal](https://vaked.dev/legal)
 
 ## License
 
