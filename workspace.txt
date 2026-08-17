@@ -1,0 +1,9 @@
+# ultra-ralph-local — workspace
+
+Minimal local dogfeed loop for ralph: a 1B gemma (mlx-community/gemma-3-1b-it-4bit
+served via mlx_lm.server) makes one decision per run and appends it to
+decisions.log (hash-chained, one entry per line: hash|timestamp|text).
+
+Purpose: keep a daily, low-cost reasoning trace — what is the single most
+important next step for the quantal/guardrail work, decided by a local model
+with zero API cost.

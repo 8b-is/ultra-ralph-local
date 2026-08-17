@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+dist/
+build/
+.server/
+.env
+.env.*
+ralph-local
+decisions.log
+ralph-loop.log

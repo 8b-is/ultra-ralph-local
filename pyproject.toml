@@ -1,0 +1,47 @@
+[build-system]
+requires = ["hatchling>=1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ultra-ralph-local"
+version = "0.1.0"
+description = "Public uvx CLI for the Ralph recursive decision loop"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [
+  { name = "8b-is" },
+]
+dependencies = [
+  "huggingface_hub>=0.35.0",
+  "platformdirs>=4.3.0",
+]
+keywords = ["agents", "cli", "openrouter", "huggingface", "uvx"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Utilities",
+]
+
+[project.scripts]
+ultra-ralph-local = "ultra_ralph_local.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/8b-is/ultra-ralph-local"
+Repository = "https://github.com/8b-is/ultra-ralph-local"
+Issues = "https://github.com/8b-is/ultra-ralph-local/issues"
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/dyad-mapping/.git",
+  "/dyad-mapping/.ultramesh-mem",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
