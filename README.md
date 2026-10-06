@@ -102,6 +102,11 @@ Supported environment variables:
 
 ## Upload behavior
 
+Uploads are disabled until explicitly enabled in setup, saved config, `RALPH_UPLOAD=true`,
+or `--upload`. A Hugging Face token alone does not enable uploads. Existing explicit
+upload preferences remain in effect. Config files without an upload preference default
+to disabled.
+
 Uploads are non-fatal.
 
 If Hugging Face auth is missing or upload fails:
@@ -123,6 +128,20 @@ uvx --from git+https://github.com/8b-is/ultra-ralph-local ultra-ralph-local \
   --hf-repo your-name/your-dataset \
   --hf-path ralph/decisions.log
 ```
+
+## Decision log verification
+
+New records use `digest|timestamp|decision` on one line. The SHA-256 input is
+`previous_digest + "\n" + decision + "\n" + timestamp`, encoded as UTF-8,
+using exactly the stored timestamp and decision. The first previous digest is
+empty. Decision line breaks are replaced with spaces and outer whitespace is
+trimmed before hashing and writing.
+
+Older records hashed an unrecorded higher-precision timestamp and sometimes
+untrimmed text, so they cannot generally be independently verified. Existing
+records are preserved; new records link to the last stored digest. This does not
+retroactively verify the legacy prefix. A hash chain alone does not authenticate
+its author or prevent someone from rewriting the whole file.
 
 ## Workspace inputs
 

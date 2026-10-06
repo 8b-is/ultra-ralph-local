@@ -100,7 +100,7 @@ def test_resolve_config_uses_default_hf_target(tmp_path: Path, monkeypatch) -> N
 
     assert resolved.hf_repo == cli.DEFAULT_HF_REPO
     assert resolved.hf_path == cli.DEFAULT_HF_PATH
-    assert resolved.upload_enabled is True
+    assert resolved.upload_enabled is False
 
 
 def test_first_run_setup_uses_custom_hf_destination(tmp_path: Path, monkeypatch) -> None:
@@ -184,3 +184,49 @@ def test_upload_log_uses_dataset_defaults(tmp_path: Path, monkeypatch) -> None:
     assert calls["repo_id"] == cli.DEFAULT_HF_REPO
     assert calls["path_in_repo"] == cli.DEFAULT_HF_PATH
     assert calls["repo_type"] == "dataset"
+
+
+def test_log_hashes_reconstruct_from_saved_records(tmp_path: Path) -> None:
+    import hashlib
+
+    cli.append_log(tmp_path, "  Decision: first | detail  ")
+    cli.append_log(tmp_path, "Decision: second\nwith continuation\r\nlast line")
+    lines = (tmp_path / cli.LOG_NAME).read_text(encoding="utf-8").splitlines()
+    assert len(lines) == 2
+    previous = ""
+    for line in lines:
+        digest, timestamp, decision = line.split("|", 2)
+        expected = hashlib.sha256(f"{previous}\n{decision}\n{timestamp}".encode()).hexdigest()
+        assert digest == expected
+        previous = digest
+
+
+def test_append_preserves_legacy_record(tmp_path: Path) -> None:
+    import hashlib
+
+    legacy = "a" * 64 + "|2026-01-01T00:00:00Z|Decision: legacy\n"
+    path = tmp_path / cli.LOG_NAME
+    path.write_text(legacy, encoding="utf-8")
+    cli.append_log(tmp_path, "Decision: next")
+    assert path.read_text(encoding="utf-8").startswith(legacy)
+    digest, timestamp, decision = path.read_text(encoding="utf-8").splitlines()[1].split("|", 2)
+    assert digest == hashlib.sha256(f"{'a' * 64}\n{decision}\n{timestamp}".encode()).hexdigest()
+
+
+def test_legacy_config_without_upload_preference_stays_local(tmp_path: Path, monkeypatch) -> None:
+    path = tmp_path / "config.json"
+    path.write_text(json.dumps({"hf_token": "synthetic-token"}), encoding="utf-8")
+    monkeypatch.setattr(cli, "CONFIG_PATH", path)
+    assert cli.load_config().upload_enabled is False
+
+
+def test_token_alone_does_not_enable_upload(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(cli, "CONFIG_PATH", tmp_path / "missing.json")
+    monkeypatch.setenv("OPENROUTER_API_KEY", "synthetic-key")
+    monkeypatch.setenv("HF_TOKEN", "synthetic-token")
+    monkeypatch.delenv("RALPH_UPLOAD", raising=False)
+    resolved = cli.resolve_config(Args(workspace=str(tmp_path)))
+    assert resolved.upload_enabled is False
+    monkeypatch.setenv("RALPH_UPLOAD", "true")
+    assert cli.resolve_config(Args(workspace=str(tmp_path))).upload_enabled is True
+    assert cli.resolve_config(Args(workspace=str(tmp_path), upload=False)).upload_enabled is False
