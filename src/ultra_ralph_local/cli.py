@@ -50,7 +50,7 @@ class Config:
     hf_token: str | None = None
     hf_repo: str = DEFAULT_HF_REPO
     hf_path: str = DEFAULT_HF_PATH
-    upload_enabled: bool = True
+    upload_enabled: bool = False
 
 
 @dataclass
@@ -105,7 +105,7 @@ def load_config() -> Config:
         hf_token=data.get("hf_token") or None,
         hf_repo=data.get("hf_repo") or DEFAULT_HF_REPO,
         hf_path=data.get("hf_path") or DEFAULT_HF_PATH,
-        upload_enabled=bool(data.get("upload_enabled", True)),
+        upload_enabled=bool(data.get("upload_enabled", False)),
     )
 
 
@@ -274,10 +274,11 @@ def append_log(dir_path: Path, text: str) -> str:
         lines = [line for line in log_path.read_text(encoding="utf-8").splitlines() if line.strip()]
         if lines:
             prev_hash = lines[-1].split("|", 1)[0]
-    now = datetime.now(timezone.utc)
-    payload = f"{prev_hash}\n{text}\n{now.isoformat()}"
+    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    text = " ".join(text.splitlines()).strip()
+    payload = f"{prev_hash}\n{text}\n{timestamp}"
     digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()
-    line = f"{digest}|{now.strftime('%Y-%m-%dT%H:%M:%SZ')}|{text.strip()}"
+    line = f"{digest}|{timestamp}|{text}"
     with log_path.open("a", encoding="utf-8") as handle:
         handle.write(line + "\n")
     return f"appended: {line}"
